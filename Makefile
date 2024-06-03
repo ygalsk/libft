@@ -1,47 +1,77 @@
-# Name of the binary
-NAME 		= libft.a
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: dkremer <dkremer@student.42heilbronn.de>   +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/06/03 14:10:04 by dkremer           #+#    #+#              #
+#    Updated: 2024/06/03 14:36:13 by dkremer          ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-# Compiler and flags
-CC 			= cc
-CFLAGS 	= -g -Wall -Werror -Wextra
+
+NAME = libft.a
+
+CC = cc
+CFLAGS = -Wall -Wextra -Werror -I./inc
+
+# Directory names
+GNL_DIR    = gnl
+MEM_DIR    = mem
+CHAR_DIR   = char
+STR_DIR    = str
+PRINTF_DIR = printf
+PUT_DIR    = put
+CONV_DIR   = conv
+BINDIR     = bin
 
 # Source files
-SRCS 		=	$(wildcard ./gnl/*.c ./mem/*.c ./put/*.c ./str/*.c ./char/*.c ./conv/*.c ./printf/*.c)	
-# Header files
-HEADERS = ./include/libft.h
+GNL_SRCS    = $(wildcard $(GNL_DIR)/*.c)
+MEM_SRCS    = $(wildcard $(MEM_DIR)/*.c)
+CHAR_SRCS   = $(wildcard $(CHAR_DIR)/*.c)
+STR_SRCS    = $(wildcard $(STR_DIR)/*.c)
+PRINTF_SRCS = $(wildcard $(PRINTF_DIR)/*.c)
+PUT_SRCS    = $(wildcard $(PUT_DIR)/*.c)
+CONV_SRCS   = $(wildcard $(CONV_DIR)/*.c)
 
-# Object files
-OBJS 		= $(SRCS:.c=.o)
+# Combine all source files
+SRCS        = $(GNL_SRCS) $(MEM_SRCS) $(CHAR_SRCS) $(STR_SRCS) $(PRINTF_SRCS) $(PUT_SRCS) $(CONV_SRCS)
 
-# Default target
+OBJS = $(SRCS:%.c=$(BINDIR)/%.o)
+
 all: $(NAME)
 
-$(NAME): $(OBJS) $(HEADERS)
-	@ar rc $(NAME) $(OBJS)
-	@ranlib $(NAME)
-	@echo $(GREEN)"Linking $(NAME)"$(DEFAULT);
+.SILENT:
 
-%.o: %.c
-	@$(CC) $(CFLAGS) -c $< -o $@
+$(NAME): $(OBJS)
+	ar rc $(NAME) $(OBJS)
+	ranlib $(NAME)
+	echo $(GREEN)"Linking $(NAME)"$(DEFAULT)
 
-# Remove all object files
+$(BINDIR):
+	echo $(GREEN)"Creating $(BINDIR) directory"$(DEFAULT)
+	mkdir -p $(BINDIR)
+
+$(BINDIR)/%.o: %.c | $(BINDIR)
+	mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+
 clean:
-	@rm -f $(OBJS)
-	@echo $(RED)"Removing libft object files"$(DEFAULT);
+	rm -f $(BINDIR)/**/*.o
+	echo $(RED)"Cleaning object files"$(DEFAULT)
 
-# Remove all files
-fclean:
-	@rm -f $(OBJS)
-	@rm -f $(NAME)
-	@echo $(RED)"Removing $(NAME)"$(DEFAULT);
+fclean: clean
+	rm -f $(NAME)
+	rm -rf $(BINDIR)
+	echo $(RED)"Removing $(NAME) and $(BINDIR) directory"$(DEFAULT)
 
-# Rebuild everything
 re: fclean all
-	@echo $(GREEN)"Rebuilding everything"$(DEFAULT);
 
 .PHONY: all clean fclean re
 
 # Colours
 DEFAULT = "\033[39m"
-GREEN		= "\033[32m"
-RED			= "\033[31m"
+GREEN   = "\033[32m"
+RED     = "\033[31m"
+
